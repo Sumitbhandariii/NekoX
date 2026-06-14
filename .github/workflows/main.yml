@@ -24,20 +24,8 @@ jobs:
         mkdir -p TMessagesProj/config
         echo "$KEYSTORE_BASE64" | base64 --decode > TMessagesProj/config/release.keystore
 
-    - name: Build with Gradle
-      env:
-        KEYSTORE_PASSWORD: ${{ secrets.KEY_PASS }}
-        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-      run: |
-        ./gradlew assembleAfatRelease \
-          -PRELEASE_STORE_PASSWORD=$KEYSTORE_PASSWORD \
-          -PRELEASE_KEY_ALIAS=$KEY_ALIAS \
-          -PRELEASE_KEY_PASSWORD=$KEYSTORE_PASSWORD \
-          -Pandroid.injected.signing.store.file=../TMessagesProj/config/release.keystore \
-          -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
-          -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
-          -Pandroid.injected.signing.key.password=$KEYSTORE_PASSWORD \
-          -x :TMessagesProj_App:validateSigningAfatRelease
+    - name: Build Main App Only
+      run: ./gradlew :TMessagesProj_App:assembleAfatRelease -PRELEASE_STORE_PASSWORD="${{ secrets.KEY_PASS }}" -PRELEASE_KEY_ALIAS="${{ secrets.KEY_ALIAS }}" -PRELEASE_KEY_PASSWORD="${{ secrets.KEY_PASS }}"
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
