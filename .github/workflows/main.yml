@@ -33,10 +33,13 @@ jobs:
         sed -i "s/public static int APP_ID = 4;/public static int APP_ID = ${MY_API_ID};/g" TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
         sed -i 's/public static String APP_HASH = ".*";/public static String APP_HASH = "'"${MY_API_HASH}"'";/g' TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
 
-        # 2. Safely change Package ID globally in gradle.properties to avoid Google Services error
+        # 2. Fix Update Issue by changing Package ID globally in gradle.properties
         sed -i 's/APP_PACKAGE=org.telegram.messenger/APP_PACKAGE=org.telegram.messenger.custom/g' gradle.properties
 
-        # 3. Change App Name for home screen
+        # 3. Fix Huawei & Google Services error by updating all JSON config files
+        find . -name "*.json" -exec sed -i 's/"org.telegram.messenger"/"org.telegram.messenger.custom"/g' {} +
+
+        # 4. Change App Name for home screen
         sed -i 's/<string name="AppName">Telegram<\/string>/<string name="AppName">NekoX Custom<\/string>/g' TMessagesProj/src/main/res/values/strings.xml
 
     - name: Build Main App Only
