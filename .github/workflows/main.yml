@@ -33,15 +33,15 @@ jobs:
         sed -i "s/public static int APP_ID = 4;/public static int APP_ID = ${MY_API_ID};/g" TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
         sed -i 's/public static String APP_HASH = ".*";/public static String APP_HASH = "'"${MY_API_HASH}"'";/g' TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
 
-        # 2. Fix Update Issue by changing Package ID and Namespace
+        # 2. Fix Update Issue by changing Package ID and Namespace safely
         sed -i 's/defaultConfig.applicationId = APP_PACKAGE/defaultConfig.applicationId = "org.telegram.messenger.custom"/g' TMessagesProj_App/build.gradle
-        sed -i "s/namespace 'org.telegram.messenger.regular'/namespace 'org.telegram.messenger.custom'/g" TMessagesProj_App/build.gradle
+        sed -i 's/namespace '"'"'org.telegram.messenger.regular'"'"'/namespace '"'"'org.telegram.messenger.custom'"'"'/g' TMessagesProj_App/build.gradle
 
         # 3. Change App Name for home screen
         sed -i 's/<string name="AppName">Telegram<\/string>/<string name="AppName">NekoX Custom<\/string>/g' TMessagesProj/src/main/res/values/strings.xml
 
-    - name: Build Real NekoX Variant
-      run: ./gradlew :TMessagesProj_App:assembleNekoRelease -PRELEASE_STORE_PASSWORD="${{ secrets.KEY_PASS }}" -PRELEASE_KEY_ALIAS="${{ secrets.KEY_ALIAS }}" -PRELEASE_KEY_PASSWORD="${{ secrets.KEY_PASS }}"
+    - name: Build Main App Only
+      run: ./gradlew :TMessagesProj_App:assembleAfatRelease -PRELEASE_STORE_PASSWORD="${{ secrets.KEY_PASS }}" -PRELEASE_KEY_ALIAS="${{ secrets.KEY_ALIAS }}" -PRELEASE_KEY_PASSWORD="${{ secrets.KEY_PASS }}"
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
