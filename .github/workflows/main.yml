@@ -24,7 +24,7 @@ jobs:
         mkdir -p TMessagesProj/config
         echo "$KEYSTORE_BASE64" | base64 --decode > TMessagesProj/config/release.keystore
 
-    - name: Inject API Keys, Change Package ID & App Name
+    - name: Inject API Keys & Change App Name
       env:
         MY_API_ID: ${{ secrets.TELEGRAM_API_ID }}
         MY_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
@@ -33,13 +33,7 @@ jobs:
         sed -i "s/public static int APP_ID = 4;/public static int APP_ID = ${MY_API_ID};/g" TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
         sed -i 's/public static String APP_HASH = ".*";/public static String APP_HASH = "'"${MY_API_HASH}"'";/g' TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
 
-        # 2. Fix Update Issue by changing Package ID globally in gradle.properties
-        sed -i 's/APP_PACKAGE=org.telegram.messenger/APP_PACKAGE=org.telegram.messenger.custom/g' gradle.properties
-
-        # 3. Fix Huawei & Google Services error by updating all JSON config files
-        find . -name "*.json" -exec sed -i 's/"org.telegram.messenger"/"org.telegram.messenger.custom"/g' {} +
-
-        # 4. Change App Name for home screen
+        # 2. Change App Name for home screen to recognize it easily
         sed -i 's/<string name="AppName">Telegram<\/string>/<string name="AppName">NekoX Custom<\/string>/g' TMessagesProj/src/main/res/values/strings.xml
 
     - name: Build Main App Only
