@@ -28,7 +28,7 @@ jobs:
         KEYSTORE_PASSWORD: ${{ secrets.KEY_PASS }}
         KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
       run: |
-        ./gradlew assemblePlayRelease \
+        ./gradlew assembleRelease \
           -Pandroid.injected.signing.store.file=../release.keystore \
           -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
           -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
@@ -37,5 +37,5 @@ jobs:
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: NekoX-Play-Release
-        path: TMessagesProj/build/outputs/apk/play/release/*.apk
+        name: NekoX-Release
+        path: TMESSAGESPROJ_APP/build/outputs/apk/release/*.apk
