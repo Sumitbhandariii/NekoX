@@ -17,27 +17,30 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
 
-    - name: Base64 to Keystore File
+    - name: Create Keystore Directory and Decode
       env:
         KEYSTORE_BASE64: ${{ secrets.KEY_STORE }}
       run: |
-        echo "$KEYSTORE_BASE64" | base64 --decode > release.keystore
+        mkdir -p TMessagesProj/config
+        echo "$KEYSTORE_BASE64" | base64 --decode > TMessagesProj/config/release.keystore
 
     - name: Build with Gradle
       env:
         KEYSTORE_PASSWORD: ${{ secrets.KEY_PASS }}
         KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
       run: |
-        ./gradlew assembleStandaloneRelease \
-          -Pandroid.injected.signing.store.file=release.keystore \
+        ./gradlew assembleAfatRelease \
+          -PRELEASE_STORE_PASSWORD=$KEYSTORE_PASSWORD \
+          -PRELEASE_KEY_ALIAS=$KEY_ALIAS \
+          -PRELEASE_KEY_PASSWORD=$KEYSTORE_PASSWORD \
+          -Pandroid.injected.signing.store.file=../TMessagesProj/config/release.keystore \
           -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
           -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
           -Pandroid.injected.signing.key.password=$KEYSTORE_PASSWORD \
-          -x :TMessagesProj_App:validateSigningAfatRelease \
-          -x :TMessagesProj_App:validateSigningPlayRelease
+          -x :TMessagesProj_App:validateSigningAfatRelease
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: NekoX-Final-Release
+        name: NekoX-Official-Release
         path: "**/build/outputs/apk/**/*.apk"
