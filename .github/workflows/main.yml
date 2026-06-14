@@ -24,6 +24,15 @@ jobs:
         mkdir -p TMessagesProj/config
         echo "$KEYSTORE_BASE64" | base64 --decode > TMessagesProj/config/release.keystore
 
+    - name: Inject Real Telegram API Keys
+      env:
+        MY_API_ID: ${{ secrets.TELEGRAM_API_ID }}
+        MY_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+      run: |
+        # BuildVars.java फाइल में नकली APP_ID = 4 और APP_HASH को आपके असली सीक्रेट्स से बदलना
+        sed -i "s/public static int APP_ID = 4;/public static int APP_ID = ${MY_API_ID};/g" TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
+        sed -i 's/public static String APP_HASH = ".*";/public static String APP_HASH = "'"${MY_API_HASH}"'";/g' TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
+
     - name: Build Main App Only
       run: ./gradlew :TMessagesProj_App:assembleAfatRelease -PRELEASE_STORE_PASSWORD="${{ secrets.KEY_PASS }}" -PRELEASE_KEY_ALIAS="${{ secrets.KEY_ALIAS }}" -PRELEASE_KEY_PASSWORD="${{ secrets.KEY_PASS }}"
 
@@ -32,3 +41,4 @@ jobs:
       with:
         name: NekoX-Official-Release
         path: "**/build/outputs/apk/**/*.apk"
+        
